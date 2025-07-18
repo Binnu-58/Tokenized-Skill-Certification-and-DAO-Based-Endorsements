@@ -77,4 +77,23 @@ contract SkillDAO is ERC721, Ownable {
     function getEndorsementCount(uint256 tokenId) public view returns (uint256) {
         return endorsements[tokenId].length;
     }
+
+    /// 🔍 NEW FUNCTION: View full certification details
+    function getCertificationDetails(uint256 tokenId) external view returns (
+        string memory skillName,
+        uint256 level,
+        address certifier,
+        uint256 issueDate,
+        uint256 expiryDate
+    ) {
+        Certification memory cert = certifications[tokenId];
+        return (
+            cert.skillName,
+            cert.level,
+            cert.certifier,
+            cert.issueDate,
+            cert.expiryDate
+        );
+    }
 }
+
