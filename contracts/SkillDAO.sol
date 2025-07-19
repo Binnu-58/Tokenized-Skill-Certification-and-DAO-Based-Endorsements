@@ -17,21 +17,18 @@ contract SkillDAO is ERC721, Ownable {
         uint256 expiryDate;
     }
 
-    struct Endorsement {
-        address endorser;
-        uint256 weight;
-        string comment;
-        uint256 timestamp;
-    }
+    mapping(uint256 => Certification) private _certifications;
+    mapping(uint256 => Endorsement[]) private _endorsements;
+    mapping(address => bool) private _certifiedApprovers;
 
-    mapping(uint256 => Certification) public certifications;
-    mapping(uint256 => Endorsement[]) public endorsements;
-    mapping(address => bool) public certifiedApprovers;
+    event CertificationIssued(uint256 indexed tokenId, address indexed recipient, string skillName, uint256 level, address certifier, uint256 issueDate, uint256 expiryDate);
+    event EndorsementAdded(uint256 indexed tokenId, address indexed endorser, uint256 weight, string comment, uint256 timestamp);
+    event CertificationRevoked(uint256 indexed tokenId);
 
-    constructor() ERC721("SkillDAO", "SKLDAO") Ownable(msg.sender) {}
+    constructor() ERC721("SkillDAO", "SKLDAO") Ownable() {}
 
     function addApprover(address approver) external onlyOwner {
-        certifiedApprovers[approver] = true;
+        _certifiedApprovers[approver] = true;
     }
 
     function issueCertification(
@@ -40,11 +37,11 @@ contract SkillDAO is ERC721, Ownable {
         uint256 level,
         uint256 expiryDuration
     ) external {
-        require(certifiedApprovers[msg.sender], "Not authorized");
+        require(_certifiedApprovers[msg.sender], "Not authorized");
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         
-        certifications[tokenId] = Certification({
+        _certifications[tokenId] = Certification({
             skillName: skillName,
             level: level,
             certifier: msg.sender,
@@ -53,6 +50,8 @@ contract SkillDAO is ERC721, Ownable {
         });
         
         _mint(recipient, tokenId);
+        
+        emit CertificationIssued(tokenId, recipient, skillName, level, msg.sender, block.timestamp, block.timestamp + expiryDuration);
     }
 
     function addEndorsement(
@@ -61,24 +60,27 @@ contract SkillDAO is ERC721, Ownable {
         string memory comment
     ) external {
         require(ownerOf(tokenId) != msg.sender, "Cannot endorse yourself");
-        endorsements[tokenId].push(Endorsement({
+        _endorsements[tokenId].push(Endorsement({
             endorser: msg.sender,
             weight: weight,
             comment: comment,
             timestamp: block.timestamp
         }));
+        
+        emit EndorsementAdded(tokenId, msg.sender, weight, comment, block.timestamp);
     }
 
     function revokeCertification(uint256 tokenId) external onlyOwner {
         _burn(tokenId);
-        delete certifications[tokenId];
+        delete _certifications[tokenId];
+        
+        emit CertificationRevoked(tokenId);
     }
 
-    function getEndorsementCount(uint256 tokenId) public view returns (uint256) {
-        return endorsements[tokenId].length;
+    function getEndorsementCount(uint256 tokenId) external view returns (uint256) {
+        return _endorsements[tokenId].length;
     }
 
-    /// 🔍 NEW FUNCTION: View full certification details
     function getCertificationDetails(uint256 tokenId) external view returns (
         string memory skillName,
         uint256 level,
@@ -86,7 +88,7 @@ contract SkillDAO is ERC721, Ownable {
         uint256 issueDate,
         uint256 expiryDate
     ) {
-        Certification memory cert = certifications[tokenId];
+        Certification memory cert = _certifications[tokenId];
         return (
             cert.skillName,
             cert.level,
@@ -96,4 +98,3 @@ contract SkillDAO is ERC721, Ownable {
         );
     }
 }
-
