@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillDAO - Tokenized Skill Certification</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-certificate"></i>
+                <span>SkillDAO</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#certify" class="nav-link">Certify Skills</a>
+                <a href="#endorse" class="nav-link">Endorse</a>
+                <a href="#verify" class="nav-link">Verify</a>
+            </nav>
+            <button id="connectWallet" class="connect-wallet-btn">
+                <i class="fas fa-wallet"></i>
+                Connect Wallet
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Decentralized Skill Certification</h1>
+            <p>Tokenize your skills, get endorsed by the community, and build verifiable on-chain credentials</p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number" id="totalCertifications">0</span>
+                    <span class="stat-label">Certifications</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="totalEndorsements">0</span>
+                    <span class="stat-label">Endorsements</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="totalValidators">0</span>
+                    <span class="stat-label">Validators</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Wallet Status -->
+        <div id="walletStatus" class="wallet-status hidden">
+            <div class="status-card">
+                <div class="status-info">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>Connected:</strong>
+                        <span id="connectedAddress"></span>
+                    </div>
+                </div>
+                <div class="balance">
+                    <span>Balance: </span>
+                    <span id="ethBalance">0 ETH</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skill Certification Section -->
+        <section id="certify" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-certificate"></i> Certify Your Skills</h2>
+                <p>Create NFT-based skill certifications validated by the community</p>
+            </div>
+            
+            <div class="card">
+                <form id="certifyForm" class="form">
+                    <div class="form-group">
+                        <label for="skillName">
+                            <i class="fas fa-code"></i>
+                            Skill Name
+                        </label>
+                        <input type="text" id="skillName" placeholder="e.g., Smart Contract Development" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="skillLevel">
+                            <i class="fas fa-star"></i>
+                            Proficiency Level
+                        </label>
+                        <select id="skillLevel" required>
+                            <option value="">Select Level</option>
+                            <option value="1">Beginner</option>
+                            <option value="2">Intermediate</option>
+                            <option value="3">Advanced</option>
+                            <option value="4">Expert</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">
+                            <i class="fas fa-file-text"></i>
+                            Description
+                        </label>
+                        <textarea id="description" placeholder="Describe your expertise and experience" rows="4" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="primary-btn">
+                        <i class="fas fa-plus"></i>
+                        Create Certification
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Endorsement Section -->
+        <section id="endorse" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-thumbs-up"></i> Endorse Skills</h2>
+                <p>Support community members by endorsing their skills</p>
+            </div>
+            
+            <div class="card">
+                <form id="endorseForm" class="form">
+                    <div class="form-group">
+                        <label for="certificationId">
+                            <i class="fas fa-hashtag"></i>
+                            Certification ID
+                        </label>
+                        <input type="number" id="certificationId" placeholder="Enter certification ID" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="endorsementMessage">
+                            <i class="fas fa-comment"></i>
+                            Endorsement Message
+                        </label>
+                        <textarea id="endorsementMessage" placeholder="Why do you endorse this skill?" rows="3" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="primary-btn">
+                        <i class="fas fa-heart"></i>
+                        Endorse Skill
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Verification Section -->
+        <section id="verify" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-shield-alt"></i> Verify Certifications</h2>
+                <p>Look up and verify existing skill certifications</p>
+            </div>
+            
+            <div class="card">
+                <form id="verifyForm" class="form">
+                    <div class="form-group">
+                        <label for="verifyId">
+                            <i class="fas fa-search"></i>
+                            Certification ID or Address
+                        </label>
+                        <input type="text" id="verifyId" placeholder="Enter certification ID or wallet address" required>
+                    </div>
+                    
+                    <button type="submit" class="primary-btn">
+                        <i class="fas fa-search"></i>
+                        Verify Certification
+                    </button>
+                </form>
+                
+                <div id="verificationResult" class="verification-result hidden">
+                    <h3>Certification Details</h3>
+                    <div id="certificationDetails"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Activity -->
+        <section class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-activity"></i> Recent Activity</h2>
+                <p>Latest certifications and endorsements on the platform</p>
+            </div>
+            
+            <div class="activity-feed" id="activityFeed">
+                <!-- Activity items will be populated by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Processing transaction...</p>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification hidden">
+        <div class="notification-content">
+            <i class="notification-icon"></i>
+            <span class="notification-message"></span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3>SkillDAO</h3>
+                <p>Decentralized skill certification platform</p>
+                <div class="contract-info">
+                    <strong>Contract:</strong>
+                    <span class="contract-address">0xc37AE2323BA365C18c16225C5b5522DD9B0A64B2</span>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Resources</h4>
+                <a href="#" target="_blank">Documentation</a>
+                <a href="#" target="_blank">GitHub</a>
+                <a href="#" target="_blank">Discord</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Web3 Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.10.0/web3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
